@@ -9,7 +9,7 @@ shape_Dir2genDir = function(a) {
 #' SBM correction to Generalized Dirichlet parameters
 #' @export
 delCorrection_SBM = function(p_small, p_large, K) {
-  if (all.equal(p_large, 0.0)) {
+  if (p_large == 0.0) {
     out = K*p_small/(K-1)
   } else {
     aa = 1.0 - p_large
