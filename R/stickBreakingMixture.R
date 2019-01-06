@@ -53,6 +53,7 @@ rSBM = function(K, p_small, p_large=0.0, eta, gam, del, logout=FALSE, logcompute
   ## latent z
   z = numeric(n)
   lz = numeric(n)
+  loneminusz = numeric(n)
 
   if ( logcompute ) {
     for ( i in 1:n ) {
@@ -71,6 +72,7 @@ rSBM = function(K, p_small, p_large=0.0, eta, gam, del, logout=FALSE, logcompute
       lxm = max(lx1, lx2)
       lxsum = lxm + log( exp(lx1 - lxm) + exp(lx2 - lxm) )
       lz[i] = lx1 - lxsum
+      loneminusz[i] = lx2 - lxsum
 
     }
   } else { # not logcompute
@@ -90,7 +92,8 @@ rSBM = function(K, p_small, p_large=0.0, eta, gam, del, logout=FALSE, logcompute
     lwhatsleft = 0.0
     for ( i in 1:n ) {
       lw[i] = lz[i] + lwhatsleft
-      lwhatsleft = lwhatsleft + log( 1.0 - exp(lw[i] - lwhatsleft) ) # logsumexp
+      # lwhatsleft = lwhatsleft + log( 1.0 - exp(lw[i] - lwhatsleft) ) # logsumexp
+      lwhatsleft = lwhatsleft + loneminusz[i]
     }
     lw[K] = lwhatsleft
     w = exp(lw)
@@ -186,6 +189,7 @@ rPostSBM = function(x, p_small, p_large=0.0, eta, gam, del, w_logout=FALSE, z_lo
   grp_indx = list()
   grp_n = list()
   lz = numeric(n)
+  loneminusz = numeric(n)
 
   for ( ii in 1:3 ) {
     grp_indx[[ii]] = which(xi == ii)
@@ -196,6 +200,7 @@ rPostSBM = function(x, p_small, p_large=0.0, eta, gam, del, w_logout=FALSE, z_lo
       lxm = pmax(lx1, lx2)
       lxsum = lxm + log( exp(lx1 - lxm) + exp(lx2 - lxm) )
       lz[grp_indx[[ii]]] = lx1 - lxsum
+      loneminusz[grp_indx[[ii]]] = lx2 - lxsum
     }
   }
 
@@ -238,7 +243,8 @@ rPostSBM = function(x, p_small, p_large=0.0, eta, gam, del, w_logout=FALSE, z_lo
   lwhatsleft = 0.0
   for ( i in 1:n ) {
     lw[i] = lz[i] + lwhatsleft
-    lwhatsleft = lwhatsleft + log( 1.0 - exp(lw[i] - lwhatsleft) ) # logsumexp
+    # lwhatsleft = lwhatsleft + log( 1.0 - exp(lw[i] - lwhatsleft) ) # logsumexp
+    lwhatsleft = lwhatsleft + loneminusz[i]
   }
   lw[K] = lwhatsleft
 
