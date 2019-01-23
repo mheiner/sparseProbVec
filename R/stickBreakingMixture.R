@@ -10,7 +10,7 @@ shape_Dir2genDir = function(a) {
 #' @export
 delCorrection_SBM = function(p_small, p_large, K) {
   if (p_large == 0.0) {
-    out = K*p_small/(K-1)
+    out = ((1.0 - p_small)*(K - 1) + 1) / K
   } else {
     aa = 1.0 - p_large
     bb = 1.0 - aa^K
@@ -31,12 +31,20 @@ rSBM = function(K, p_small, p_large=0.0, eta, gam, del, logout=FALSE, logcompute
   if (!logcompute && logout) stop("logout=TRUE requires logcompute=TRUE")
 
   stopifnot(eta > 1.0)
+  n = K - 1
+
+  if ( length(p_small) == 1) {
+    p_small = rep(p_small, n)
+  }
+
+  if ( length(p_large) == 1) {
+    p_large = rep(p_large, n)
+  }
 
   ## proportions
   p_GenDir = 1.0 - p_small - p_large
-  stopifnot(p_small >= 0.0, p_large >= 0.0, p_GenDir >= 0.0, p_GenDir <= 1.0)
+  stopifnot(all(p_small >= 0.0), all(p_large >= 0.0), all(p_GenDir >= 0.0), all(p_GenDir <= 1.0))
 
-  n = K - 1
 
   if ( length(gam) == 1 ) {
     gam = rep(gam, n)
@@ -48,7 +56,10 @@ rSBM = function(K, p_small, p_large=0.0, eta, gam, del, logout=FALSE, logcompute
 
 
   ## group membership
-  xi = sample.int(n=3, size=n, replace=TRUE, prob=c(p_small, p_GenDir, p_large))
+  xi = numeric(n)
+  for ( i in 1:n ) {
+    xi[i] = sample.int(n=3, size=1, replace=TRUE, prob=c(p_small[i], p_GenDir[i], p_large[i]))
+  }
 
   ## latent z
   z = numeric(n)
@@ -137,8 +148,13 @@ rPostSBM = function(x, p_small, p_large=0.0, eta, gam, del, w_logout=FALSE, z_lo
   K = length(x)
   n = K - 1
 
-  if ( length(gam) == 1 ) {
-    gam = rep(gam, n)
+
+  if ( length(p_small) == 1 ) {
+    p_small = rep(p_small, n)
+  }
+
+  if ( length(p_large) == 1 ) {
+    p_large = rep(p_large, n)
   }
 
   if ( length(del) == 1 ) {
@@ -164,7 +180,7 @@ rPostSBM = function(x, p_small, p_large=0.0, eta, gam, del, w_logout=FALSE, z_lo
 
   ## proportions
   p_GenDir = 1.0 - p_small - p_large
-  stopifnot(p_small >= 0.0, p_large >= 0.0, p_GenDir >= 0.0, p_GenDir <= 1.0)
+  stopifnot(all(p_small >= 0.0), all(p_large >= 0.0), all(p_GenDir >= 0.0), all(p_GenDir <= 1.0))
 
 
   ## calculate posterior mixture weights
