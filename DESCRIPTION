@@ -1,7 +1,7 @@
 Package: sparseProbVec
 Type: Package
 Title: Prior Models for Sparse Probability Vectors
-Version: 0.1.0
+Version: 0.1.1
 Author: Matthew Heiner
 Maintainer: Matthew Heiner <mheiner@gmail.com>
 Description:

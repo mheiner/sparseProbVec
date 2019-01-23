@@ -27,7 +27,7 @@ delCorrection_SBM = function(p_small, p_large, K) {
 #' rSBM(K=K, p_small=0.5, p_large=0.0, eta=1.0e3, gam=1.5, del=1.5)
 #' gamdel = shape_Dir2genDir(a) # tapered parameters to mimic Dirichlet special case
 #' rSBM(K=K, p_small=0.5, p_large=0.0, eta=1.0e3, gam=gamdel[,1], del=gamdel[,2]) # tapered to mimic Dirichlet special case
-rSBM = function(K, p_small, p_large=0.0, eta, gam, del, logout=FALSE, logcompute=TRUE) {
+rSBM = function(K, p_small, p_large=0.0, eta, gam, del, logout=FALSE, logcompute=TRUE, zxi_out=FALSE) {
   if (!logcompute && logout) stop("logout=TRUE requires logcompute=TRUE")
 
   stopifnot(eta > 1.0)
@@ -121,9 +121,17 @@ rSBM = function(K, p_small, p_large=0.0, eta, gam, del, logout=FALSE, logcompute
   stopifnot(all(w > 0.0), all(w < 1.0))
 
   if (logout) {
-    return( lw )
+    if (zxi_out) {
+      return( list(lw, lz, xi) )
+    } else {
+      return( lw )
+    }
   } else {
-    return( w )
+    if (zxi_out) {
+      return( list(w, z, xi) )
+    } else {
+      return( w )
+    }
   }
 }
 
@@ -139,7 +147,7 @@ rSBM = function(K, p_small, p_large=0.0, eta, gam, del, logout=FALSE, logcompute
 #' x = c(5, 2, 3)
 #' K = length(x)
 #' rPostSBM(x=x, p_small=0.5, p_large=0.0, eta=1.0e3, gam=1.5, del=1.5)
-rPostSBM = function(x, p_small, p_large=0.0, eta, gam, del, w_logout=FALSE, z_logout=FALSE) {
+rPostSBM = function(x, p_small, p_large=0.0, eta, gam, del, w_logout=FALSE, z_logout=FALSE, zxi_out=FALSE) {
 
   stopifnot(eta > 1.0)
 
@@ -276,5 +284,9 @@ rPostSBM = function(x, p_small, p_large=0.0, eta, gam, del, w_logout=FALSE, z_lo
     out_z = exp(lz)
   }
 
-  list(w=out_w, z=out_z, xi=xi)
+  if ( zxi_out ) {
+    return( list(w=out_w, z=out_z, xi=xi) )
+  } else {
+    return( out_w )
+  }
 }
